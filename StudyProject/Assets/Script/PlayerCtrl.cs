@@ -3,45 +3,61 @@ using System.Collections;
 
 public class PlayerCtrl : MonoBehaviour {
 
-   
-    float speed = 3.0f;
-    float jumpSpeed = 8.0f;
-    float gravity = 20.0f;
-    float pushPower = 2.0f;
 
-    Animator anim;
+    private float speed = 3.0f; // 이동속도
+    private float jumpSpeed = 8.0f; // 점프 속도
+    private float gravity = 20.0f; // 중력
+    private float pushPower = 2.0f; // 미는 힘
+    private float inputAxis; // 입력 받는 키의 값
 
     private Vector3 moveDir = Vector3.zero;
+    Animator anim;
     CharacterController controller;
 
-    void Awake()
+    void Start()
     {
         controller = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
     }
 
 	void Update () {
+
+        Movement();
+    }
+
+    public void Movement()
+    {
         //이동
         if (controller.isGrounded)
         {
-            moveDir = new Vector3(0, 0, Input.GetAxis("Vertical"));
+            moveDir = new Vector3(0, 0, inputAxis);
             moveDir = transform.TransformDirection(moveDir);
             moveDir *= speed;
             anim.SetBool("Jump", false);
-            //점프
-            if (Input.GetButton("Jump"))
+
+            if (!ControlMgr.instance.switchControl)
             {
-                moveDir.y = jumpSpeed;
-                anim.SetBool("Jump", true);
+                inputAxis = Input.GetAxis("Horizontal");
+                //점프
+                if (Input.GetButtonDown("Jump") && !ControlMgr.instance.switchControl)
+                {
+                    moveDir.y = jumpSpeed;
+                    anim.SetBool("Jump", true);
+                }
             }
-        
+            else
+            {
+                inputAxis = 0f;
+                anim.SetFloat("Speed", 0f);
+            }
         }
-        
+
+        //중력 적용 및 이동
         moveDir.y -= gravity * Time.deltaTime;
         controller.Move(moveDir * Time.deltaTime);
 
         //anim.SetBool("Jump", false);
-        anim.SetFloat("Speed", Input.GetAxis("Vertical"));
+        anim.SetFloat("Speed", inputAxis);
     }
 
    //캐릭터 컨트롤러 충돌
@@ -57,7 +73,5 @@ public class PlayerCtrl : MonoBehaviour {
 
         Vector3 pushDir = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
         body.velocity = pushDir * pushPower;
-
     }
-
 }

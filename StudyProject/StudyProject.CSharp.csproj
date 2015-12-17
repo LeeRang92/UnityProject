@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="Assets\Script\BallCtrl.cs" />
     <Compile Include="Assets\Script\CameraCtrl.cs" />
+    <Compile Include="Assets\Script\ControlMgr.cs" />
     <Compile Include="Assets\Script\ObjectCtrl.cs" />
     <Compile Include="Assets\Script\PlayerCtrl.cs" />
     <Compile Include="Assets\UnityChan\Scripts\CameraController.cs" />
