@@ -1,16 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+// 캐릭터 제어를 위한 스크립트
+
 public class PlayerCtrl : MonoBehaviour {
 
-
     private float speed = 3.0f; // 이동속도
-    private float jumpSpeed = 8.0f; // 점프 속도
+    private float jumpSpeed = 6.0f; // 점프 속도
     private float gravity = 20.0f; // 중력
-    private float pushPower = 2.0f; // 미는 힘
+    private float pushPower = 2f; // 미는 힘
     private float inputAxis; // 입력 받는 키의 값
+    private bool focusRight = true; //우측을 봐라보는 여부
 
     private Vector3 moveDir = Vector3.zero;
+
     Animator anim;
     CharacterController controller;
 
@@ -20,44 +23,61 @@ public class PlayerCtrl : MonoBehaviour {
         anim = GetComponent<Animator>();
     }
 
-	void Update () {
-
-        Movement();
+	void Update ()
+    {
+       Movement();
     }
 
-    public void Movement()
+    void Movement()
     {
-        //이동
         if (controller.isGrounded)
         {
-            moveDir = new Vector3(0, 0, inputAxis);
+            //이동
+            moveDir = Vector3.forward * inputAxis;
             moveDir = transform.TransformDirection(moveDir);
-            moveDir *= speed;
+            //moveDir *= speed;
             anim.SetBool("Jump", false);
-
-            if (!ControlMgr.instance.switchControl)
+            //현재 컨트롤을 조종하는 상태일 때
+            if (!ControlMgr.instance.switchCtrl)
             {
                 inputAxis = Input.GetAxis("Horizontal");
+                
+                if(inputAxis > 0 && !focusRight) { TurnPlayer(); }
+                else if(inputAxis < 0 && focusRight) { TurnPlayer(); }
+                
                 //점프
-                if (Input.GetButtonDown("Jump") && !ControlMgr.instance.switchControl)
+                if (Input.GetButtonDown("Jump"))
                 {
                     moveDir.y = jumpSpeed;
                     anim.SetBool("Jump", true);
                 }
+                //달리기
+                if (Input.GetKey(KeyCode.LeftShift))
+                {
+                    inputAxis *= 2f;
+                    anim.SetFloat("Speed", inputAxis);
+                }
             }
+            //컨트롤이 대기상태일 때
             else
             {
                 inputAxis = 0f;
-                anim.SetFloat("Speed", 0f);
             }
         }
-
-        //중력 적용 및 이동
+        
+        //중력 및 이동
         moveDir.y -= gravity * Time.deltaTime;
-        controller.Move(moveDir * Time.deltaTime);
+        controller.Move(moveDir * speed * Time.deltaTime);
+        anim.SetFloat("Speed", inputAxis / 3f);
+    }
 
-        //anim.SetBool("Jump", false);
-        anim.SetFloat("Speed", inputAxis);
+    //캐릭터가 봐라보는 방향 회전
+    void TurnPlayer()
+    {
+        focusRight = !focusRight;
+        Vector3 scale = transform.localScale;
+        scale.z *= -1;
+        transform.localScale = scale;
     }
 
    //캐릭터 컨트롤러 충돌

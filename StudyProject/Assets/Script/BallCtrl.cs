@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+//고래를 제어하기 위한 스크립트
+
 public class BallCtrl : MonoBehaviour {
 
     float speed = 3.0f;
@@ -18,14 +20,18 @@ public class BallCtrl : MonoBehaviour {
 	}
 	
 	void Update () {
-        if (!ControlMgr.instance.switchControl)
+        if (!ControlMgr.instance.switchCtrl)
         {
+            controller.enabled = false;
+
             tr.position = Vector3.Lerp(tr.position,
                 playerTr.position - (playerTr.forward * 1.0f) + (playerTr.up * 1.5f),
                 Time.deltaTime);
         }
         else
         {
+            controller.enabled = true;
+
             moveDir = new Vector3(0, Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"));
             moveDir = transform.TransformDirection(moveDir);
             moveDir *= speed;

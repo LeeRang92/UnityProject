@@ -1,16 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+//카메라를 제어하기 위한 스크립트
+
 public class CameraCtrl : MonoBehaviour
 {
 
-    public Transform playerTr;
-    public Transform sheepTr;
+    public Transform playerTr; // 플레이어의 위치값
+    public Transform whaleTr;  // 고래의 위치값
+    public float speed = 100f; // 카메라의 속도
 
-    public float speed = 100f;
-
-    private Transform targetTr;
-    Transform tr;
+    private Transform targetTr; // 추적할 타겟의 위치값을 저장
+    private Transform tr;
 
     public static CameraCtrl instance;
 
@@ -26,14 +27,15 @@ public class CameraCtrl : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (ControlMgr.instance.switchControl)
+        //추적할 타겟의 Transform값을 바꿈
+        if (ControlMgr.instance.switchCtrl)
         {
-            targetTr = sheepTr;
+            targetTr = whaleTr;
         }
         else {
             targetTr = playerTr;
         }
-
+        //타겟 추적
         tr.position = Vector3.Lerp(tr.position,
                 targetTr.position - (targetTr.right * -5.0f) + (targetTr.up * 2.5f) + (targetTr.forward * -1.2f),
                Time.deltaTime * speed);
@@ -43,7 +45,5 @@ public class CameraCtrl : MonoBehaviour
         Quaternion drot = Quaternion.LookRotation(dir);
         Quaternion rot = Quaternion.Slerp(tr.rotation, drot, Time.deltaTime * speed);
         transform.rotation = rot;
-
-        Debug.Log(speed);
     }
 }
