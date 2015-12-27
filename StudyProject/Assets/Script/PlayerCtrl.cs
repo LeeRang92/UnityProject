@@ -23,9 +23,9 @@ public class PlayerCtrl : MonoBehaviour {
         anim = GetComponent<Animator>();
     }
 
-	void Update ()
+    void Update()
     {
-       Movement();
+        Movement();
     }
 
     void Movement()
@@ -41,10 +41,10 @@ public class PlayerCtrl : MonoBehaviour {
             if (!ControlMgr.instance.switchCtrl)
             {
                 inputAxis = Input.GetAxis("Horizontal");
-                
-                if(inputAxis > 0 && !focusRight) { TurnPlayer(); }
-                else if(inputAxis < 0 && focusRight) { TurnPlayer(); }
-                
+
+                if (inputAxis > 0 && !focusRight) { TurnPlayer(); }
+                else if (inputAxis < 0 && focusRight) { TurnPlayer(); }
+
                 //점프
                 if (Input.GetButtonDown("Jump"))
                 {
@@ -64,7 +64,7 @@ public class PlayerCtrl : MonoBehaviour {
                 inputAxis = 0f;
             }
         }
-        
+
         //중력 및 이동
         moveDir.y -= gravity * Time.deltaTime;
         controller.Move(moveDir * speed * Time.deltaTime);
@@ -80,7 +80,7 @@ public class PlayerCtrl : MonoBehaviour {
         transform.localScale = scale;
     }
 
-   //캐릭터 컨트롤러 충돌
+    //캐릭터 컨트롤러 충돌
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
         //오브젝트 밀기
@@ -93,5 +93,10 @@ public class PlayerCtrl : MonoBehaviour {
 
         Vector3 pushDir = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
         body.velocity = pushDir * pushPower;
+    }
+
+    void OnParticleCollision(GameObject other)
+    {
+        Debug.Log("Particle");
     }
 }
